@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magical Birthday Surprise | Sinnu Babu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cake-base: #ff4d6d;
+            --cake-mid: #ff758f;
+            --cake-top: #ffb3c1;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #0f172a;
+            font-family: 'Poppins', sans-serif;
+            height: 100dvh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .bg-gradient-animate {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e1b4b);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .wish-text {
+            font-family: 'Dancing Script', cursive;
+            background: linear-gradient(to right, #ff4d6d, #ffb3c1, #ff4d6d);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 4px 10px rgba(255, 77, 109, 0.3);
+            animation: float 3s ease-in-out infinite;
+            line-height: 1.2;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .cake-container {
+            position: relative;
+            width: 160px;
+            height: 120px;
+            margin: 30px auto;
+            transform-style: preserve-3d;
+        }
+
+        @media (min-width: 640px) {
+            .cake-container { width: 220px; height: 160px; }
+        }
+
+        .cake-layer {
+            position: absolute;
+            width: 100%;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .layer-bottom {
+            bottom: 0;
+            height: 45%;
+            background: linear-gradient(to bottom, #ff85a1, #ff4d6d);
+            z-index: 1;
+        }
+
+        .layer-middle {
+            bottom: 20%;
+            width: 90%;
+            left: 5%;
+            height: 40%;
+            background: linear-gradient(to bottom, #ffb3c1, #ff758f);
+            z-index: 2;
+        }
+
+        .layer-top-surface {
+            bottom: 45%;
+            width: 80%;
+            left: 10%;
+            height: 35%;
+            background: linear-gradient(to bottom, #fff0f3, #ffb3c1);
+            z-index: 3;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .candle {
+            position: absolute;
+            bottom: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 40px;
+            background: linear-gradient(to right, #eee 50%, #ff4d6d 50%);
+            background-size: 10px 10px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        .flame {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 22px;
+            background: radial-gradient(circle at bottom, #ffed4a, #ff9d00, transparent);
+            border-radius: 50% 50% 20% 20%;
+            animation: flicker 0.15s infinite alternate;
+            box-shadow: 0 0 20px #ff9d00;
+        }
+
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1) skewX(2deg); opacity: 0.8; }
+            100% { transform: translateX(-50%) scale(1.1) skewX(-2deg); opacity: 1; }
+        }
+
+        .balloon {
+            position: fixed;
+            bottom: -120px;
+            width: 45px;
+            height: 60px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            animation: sparkle-anim 1.2s ease-out forwards;
+        }
+
+        @keyframes sparkle-anim {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            30% { opacity: 1; }
+            100% { transform: scale(1.8) rotate(180deg); opacity: 0; }
+        }
+
+        .btn-surprise {
+            background: linear-gradient(45deg, #ff4d6d, #c9184a);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(255, 77, 109, 0.5);
+        }
+
+        .hidden-screen {
+            display: none;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.6s ease-out;
+        }
+
+        .visible-screen {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .text-glow-white {
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body class="bg-gradient-animate text-white overflow-hidden">
+
+    <canvas id="canvas"></canvas>
+
+    <!-- Initial Screen -->
+    <div id="initial-screen" class="flex flex-col items-center justify-center z-50 p-6 text-center">
+        <div class="mb-10 animate-bounce text-7xl drop-shadow-lg">🎁</div>
+        <button onclick="revealSurprise()" class="btn-surprise px-10 py-5 rounded-full text-xl font-bold text-white cursor-pointer hover:scale-105 active:scale-95 uppercase tracking-wider">
+            Tap for Magic ✨
+        </button>
+    </div>
+
+    <!-- Surprise Screen -->
+    <div id="surprise-screen" class="hidden-screen flex-col items-center justify-center z-50 p-4 text-center w-full h-full">
+        <div class="max-w-md mx-auto flex flex-col items-center">
+            <!-- Pink Heading -->
+            <h1 class="wish-text text-3xl sm:text-5xl font-bold mb-8 px-2">
+                Wishing you a very happy birthday Sinnu babu ✨🩵
+            </h1>
+            
+            <!-- Modern 3D Cake -->
+            <div class="cake-container">
+                <div class="cake-layer layer-bottom"></div>
+                <div class="cake-layer layer-middle"></div>
+                <div class="cake-layer layer-top-surface"></div>
+                <div class="candle">
+                    <div class="flame"></div>
+                </div>
+            </div>
+
+            <!-- White Message Content -->
+            <div class="mt-10 space-y-5 px-4">
+                <p class="text-glow-white text-lg sm:text-xl font-light">
+                    Wishing you a very happy birthday Sinnu babu  ✨🩵
+            I truly wish you endless happiness, good health, and a bright future.
+            May all your dreams come true.
+                </p>
+                <p class="text-glow-white text-lg sm:text-xl font-semibold">
+                    May all your dreams come true — <br>
+                    <span class="text-pink-300 italic">always stay blessed. 💗</span>
+                </p>
+            </div>
+            
+            <!-- Start Again button removed as per request -->
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationActive = false;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Confetti {
+            constructor() {
+                this.init();
+            }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height - canvas.height;
+                this.size = Math.random() * 8 + 4;
+                this.speed = Math.random() * 2.5 + 1.5;
+                this.angle = Math.random() * 360;
+                this.spin = Math.random() * 6 - 3;
+                this.color = `hsl(${Math.random() * 360}, 85%, 65%)`;
+                this.oscillation = Math.random() * 2;
+                this.oscillationSpeed = Math.random() * 0.02;
+                this.time = Math.random() * 100;
+            }
+            update() {
+                this.time += this.oscillationSpeed;
+                this.y += this.speed;
+                this.x += Math.sin(this.time) * this.oscillation;
+                this.angle += this.spin;
+                if (this.y > canvas.height) this.init();
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle * Math.PI / 180);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = this.color;
+                ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function createBalloon() {
+            const colors = ['#ff4d6d', '#ff758f', '#ffb3c1', '#7209b7', '#4361ee', '#4cc9f0'];
+            const b = document.createElement('div');
+            b.className = 'balloon';
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            b.style.backgroundColor = color;
+            b.style.left = Math.random() * 85 + 5 + 'vw';
+            b.style.boxShadow = `inset -8px -8px 20px rgba(0,0,0,0.2), 0 10px 20px ${color}55`;
+            
+            document.body.appendChild(b);
+            
+            const duration = Math.random() * 4 + 6;
+            b.animate([
+                { transform: `translateY(0) rotate(0deg)` },
+                { transform: `translateY(-${window.innerHeight + 250}px) rotate(${Math.random() * 30 - 15}deg)` }
+            ], {
+                duration: duration * 1000,
+                easing: 'ease-in'
+            }).onfinish = () => b.remove();
+        }
+
+        function createSparkle(x, y) {
+            const s = document.createElement('div');
+            s.className = 'sparkle';
+            const size = Math.random() * 15 + 15;
+            s.style.width = size + 'px';
+            s.style.height = size + 'px';
+            s.style.left = (x - size/2) + 'px';
+            s.style.top = (y - size/2) + 'px';
+            s.innerHTML = `<svg viewBox="0 0 24 24" fill="#ffd700"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>`;
+            document.body.appendChild(s);
+            setTimeout(() => s.remove(), 1200);
+        }
+
+        function animate() {
+            if(!animationActive) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        function revealSurprise() {
+            const initial = document.getElementById('initial-screen');
+            const surprise = document.getElementById('surprise-screen');
+            
+            initial.style.opacity = '0';
+            initial.style.transform = 'scale(1.1)';
+            
+            setTimeout(() => {
+                initial.style.display = 'none';
+                surprise.classList.add('visible-screen');
+                
+                animationActive = true;
+                const pCount = window.innerWidth < 640 ? 60 : 120;
+                for (let i = 0; i < pCount; i++) particles.push(new Confetti());
+                animate();
+
+                setInterval(createBalloon, 700);
+                setInterval(() => {
+                    createSparkle(Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+                }, 400);
+
+                const handleInteraction = (e) => {
+                    const x = e.touches ? e.touches[0].clientX : e.clientX;
+                    const y = e.touches ? e.touches[0].clientY : e.clientY;
+                    createSparkle(x, y);
+                };
+                window.addEventListener('mousemove', (e) => { if(Math.random() > 0.85) handleInteraction(e) });
+                window.addEventListener('touchstart', (e) => handleInteraction(e), {passive: true});
+            }, 500);
+        }
+    </script>
+</body>
+</html>
